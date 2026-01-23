@@ -1,38 +1,51 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // Mobile Navigation Toggle
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
+    const navItems = document.querySelectorAll('.nav-links a');
 
+    // Toggle Menu
     hamburger.addEventListener('click', () => {
-        navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+        navLinks.classList.toggle('nav-active');
+        hamburger.classList.toggle('toggle');
         
-        // Simple style injection for mobile menu layout
-        if (navLinks.style.display === 'flex') {
-            navLinks.style.flexDirection = 'column';
-            navLinks.style.position = 'absolute';
-            navLinks.style.top = '70px';
-            navLinks.style.left = '0';
-            navLinks.style.width = '100%';
-            navLinks.style.background = '#F4F3F0';
-            navLinks.style.padding = '2rem';
-            navLinks.style.borderBottom = '1px solid #ccc';
+        // Prevent background scrolling when menu is open
+        if(navLinks.classList.contains('nav-active')) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
         }
     });
 
-    // Smooth Scrolling for Anchor Links
+    // Close Menu when link is clicked
+    navItems.forEach(link => {
+        link.addEventListener('click', () => {
+            if (navLinks.classList.contains('nav-active')) {
+                navLinks.classList.remove('nav-active');
+                hamburger.classList.remove('toggle');
+                document.body.style.overflow = 'auto';
+            }
+        });
+    });
+
+    // Smooth Scroll Fix
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
             
-            // Close mobile menu if open
-            if (window.innerWidth < 768) {
-                navLinks.style.display = 'none';
-            }
+            if (targetElement) {
+                // Account for fixed header height
+                const headerOffset = 80;
+                const elementPosition = targetElement.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
-            document.querySelector(this.getAttribute('href')).scrollIntoView({
-                behavior: 'smooth'
-            });
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth"
+                });
+            }
         });
     });
 });
